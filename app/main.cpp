@@ -1,43 +1,177 @@
-#include "mainwindow.h"
+#include <bx/bx.h>
+#include <bx/os.h>
 
-#include <QApplication>
-#include <QStyleFactory>
-#include <QSurfaceFormat>
+#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+    #define GLFW_EXPOSE_NATIVE_X11
+    #define GLFW_EXPOSE_NATIVE_GLX
+#elif BX_PLATFORM_OSX
+    #define GLFW_EXPOSE_NATIVE_COCOA
+    #define GLFW_EXPOSE_NATIVE_NSGL
+#elif BX_PLATFORM_WINDOWS
+    #define GLFW_EXPOSE_NATIVE_WIN32
+    #define GLFW_EXPOSE_NATIVE_WGL
+#endif
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <bgfx/bgfx.h>
 
-int main(int argc, char *argv[]) {
+#include <bx/uint32_t.h>
 
-    QApplication a(argc, argv);
+struct MyWindow {
+    GLFWwindow* GLFWHandle{ nullptr };
+    uint32_t Width{ 0 };
+    uint32_t Height{ 0 };
+    bool IsFullscreen{ false };
+    bool IsMinimized{ false };
+    bool IsVSyncEnabled{ false };
+};
 
-    // Setup required OpenGL version and capabilites
-    QSurfaceFormat format;
-    format.setVersion(4, 4);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setDepthBufferSize(24);
-    format.setStencilBufferSize(8);
-    QSurfaceFormat::setDefaultFormat(format);
+void glfw_errorCallback(int error, const char* desc) {
+    // TODO:
+}
 
-    // Set dark stylesheet
-    a.setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
-    QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, QColor(53,53,53));
-    darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(25,25,25));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
-    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-    darkPalette.setColor(QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Button, QColor(53,53,53));
-    darkPalette.setColor(QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+void glfw_keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    auto* win{ (MyWindow*)glfwGetWindowUserPointer(window) };
 
-    a.setPalette(darkPalette);
-    a.setStyleSheet(QStringLiteral("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"));
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        static bool showInternalStats{ false };
+        showInternalStats = !showInternalStats;
 
-    MainWindow w;
-    w.show();
+        bgfx::setDebug(showInternalStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+    }
+    else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(win->GLFWHandle, GLFW_TRUE);
+    }
+}
 
-    return a.exec();
+void glfw_resizeCallback(GLFWwindow* window, int width, int height) {
+    auto* win{ (MyWindow*)glfwGetWindowUserPointer(window) };
+
+    win->IsMinimized = height == 0;
+    if (width != 0 && height != 0) {
+        bgfx::reset(width, height, win->IsVSyncEnabled ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+
+        win->Width = (uint32_t)width;
+        win->Height = (uint32_t)height;
+    }
+}
+
+void glfw_iconifyCallback(GLFWwindow* window, int iconified) {
+    auto* win{ (MyWindow*)glfwGetWindowUserPointer(window) };
+
+    win->IsMinimized = iconified == GLFW_TRUE; // Don't reset bgfx because when the window is restored we don't know the correct window dimensions.
+}
+
+bool openGLFWWindow(MyWindow* win, const int width, const int height, const bool fullscreen, const bool vsync) {
+
+    glfwSetErrorCallback(glfw_errorCallback);
+    if (!glfwInit()) {
+        return false;
+    }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    auto* monitor{ glfwGetPrimaryMonitor() };
+    const auto* mode{ glfwGetVideoMode(monitor) };
+
+    glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_ALPHA_BITS, GLFW_DONT_CARE);
+    glfwWindowHint(GLFW_DEPTH_BITS, GLFW_DONT_CARE);
+    glfwWindowHint(GLFW_STENCIL_BITS, 8);
+    glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
+
+#if BX_PLATFORM_OSX
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+
+    GLFWwindow* window{ nullptr };
+    if (fullscreen) {
+        bool nativeResolution = width <= 0 || height <= 0;
+        width = nativeResolution ? mode->width : width;
+        height = nativeResolution ? mode->height : height;
+        window = glfwCreateWindow(width, height, "DLS", monitor, nullptr);
+    }
+    else {
+        window = glfwCreateWindow(width, height, "DLS", nullptr, nullptr);
+        if (!window) {
+            return false;
+        }
+
+        glfwSetWindowPos(window, (mode->width - width) / 2, (mode->height - height) / 2);
+    }
+
+    if (win->GLFWHandle) {
+        bgfx::frame();
+        bgfx::shutdown();
+
+        glfwDestroyWindow(win->GLFWHandle);
+    }
+
+    win->GLFWHandle = window;
+    win->Width = (uint32_t)width;
+    win->Height = (uint32_t)height;
+    win->IsFullscreen = fullscreen;
+    win->IsVSyncEnabled = vsync;
+
+    {
+        bgfx::PlatformData pd;
+#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+        pd.ndt = glfwGetX11Display();
+        pd.nwh = (void *)(uintptr_t)glfwGetX11Window(win->GLFWHandle);
+#elif BX_PLATFORM_OSX
+        pd.ndt = nullptr;
+        pd.nwh = glfwGetCocoaWindow(win->GLFWHandle);
+#elif BX_PLATFORM_WINDOWS
+        pd.ndt = nullptr;
+        pd.nwh = glfwGetWin32Window(win->GLFWHandle);
+#endif // BX_PLATFORM_WINDOWS
+        pd.context = nullptr;
+        pd.backBuffer = nullptr;
+        pd.backBufferDS = nullptr;
+        bgfx::setPlatformData(pd);
+    }
+
+    // Initialize bgfx
+    if (!bgfx::init()) {
+        return false;
+    }
+
+    bgfx::reset((uint32_t)width, (uint32_t)height, vsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+    bgfx::setDebug(BGFX_DEBUG_TEXT);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0xffffffff, 1.0f, 0);
+    bgfx::setViewSeq(0, true);
+
+    glfwSetTime(0);
+
+    return true;
+}
+
+void onUpdate(const float dt) {
+    // TODO: Update your simulation here
+}
+
+void onRender(const uint32_t winWidth, const uint32_t winHeight, const uint32_t fbWidth, const uint32_t fbHeight, const float pxRatio) {
+    bgfx::setViewRect(0, 0, 0, uint16_t(fbWidth), uint16_t(fbHeight));
+
+    // This dummy draw call is here to make sure that view 0 is cleared
+    // if no other draw calls are submitted to view 0.
+    bgfx::touch(0);
+
+    // Use debug font to print information about this example.
+    bgfx::dbgTextClear();
+    bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfxTemplate");
+    bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Minimal bgfx + GLFW application.");
+    bgfx::dbgTextPrintf(0, 4, 0x4f, "Press F1 to toggle bgfx stats, Esc to quit");
+}
+
+int main() {
+
+    return 0;
 }
