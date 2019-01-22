@@ -4,9 +4,6 @@
 [submodule "app/ThirdParty/bx"]
 	path = app/ThirdParty/bx
 	url = https://github.com/bkaradzic/bx.git
-[submodule "app/ThirdParty/glm"]
-	path = app/ThirdParty/glm
-	url = https://github.com/g-truc/glm.git
 [submodule "app/ThirdParty/glfw"]
 	path = app/ThirdParty/glfw
 	url = https://github.com/glfw/glfw.git
