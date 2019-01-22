@@ -63,7 +63,7 @@ void glfw_iconifyCallback(GLFWwindow* window, int iconified) {
     win->IsMinimized = iconified == GLFW_TRUE; // Don't reset bgfx because when the window is restored we don't know the correct window dimensions.
 }
 
-bool openGLFWWindow(MyWindow* win, const int width, const int height, const bool fullscreen, const bool vsync) {
+bool openGLFWWindow(MyWindow* win, int width, int height, const bool fullscreen, const bool vsync) {
 
     glfwSetErrorCallback(glfw_errorCallback);
     if (!glfwInit()) {
@@ -138,6 +138,11 @@ bool openGLFWWindow(MyWindow* win, const int width, const int height, const bool
         bgfx::setPlatformData(pd);
     }
 
+    glfwSetKeyCallback(win->GLFWHandle, glfw_keyCallback);
+    glfwSetWindowSizeCallback(win->GLFWHandle, glfw_resizeCallback);
+    glfwSetWindowIconifyCallback(win->GLFWHandle, glfw_iconifyCallback);
+    glfwSetWindowUserPointer(win->GLFWHandle, win);
+
     // Initialize bgfx
     if (!bgfx::init()) {
         return false;
@@ -151,6 +156,14 @@ bool openGLFWWindow(MyWindow* win, const int width, const int height, const bool
     glfwSetTime(0);
 
     return true;
+}
+
+void closeGLFWWindow(MyWindow* win) {
+    if (win->GLFWHandle) {
+        bgfx::shutdown();
+        glfwTerminate();
+        win->GLFWHandle = nullptr;
+    }
 }
 
 void onUpdate(const float dt) {
@@ -172,6 +185,48 @@ void onRender(const uint32_t winWidth, const uint32_t winHeight, const uint32_t 
 }
 
 int main() {
+
+    MyWindow win;
+    memset(&win, 0, sizeof(MyWindow));
+
+    if (!openGLFWWindow(&win, 1280, 720, false, true)) {
+        return -1;
+    }
+
+    // Main loop
+    auto prevTime{ glfwGetTime() };
+    while (!glfwWindowShouldClose(win.GLFWHandle)) {
+        const auto t{ glfwGetTime() };
+        const auto dt{ t - prevTime };
+        prevTime = t;
+
+        // If the window is minimized, sleep for 1 frame.
+        if (win.IsMinimized) {
+            bx::sleep(16);
+            glfwPollEvents();
+            continue;
+        }
+
+        int winWidth, winHeight;
+        int fbWidth, fbHeight;
+        glfwGetWindowSize(win.GLFWHandle, &winWidth, &winHeight);
+        glfwGetFramebufferSize(win.GLFWHandle, &fbWidth, &fbHeight);
+
+        winWidth = bx::uint32_max(winWidth, 1);
+        winHeight = bx::uint32_max(winHeight, 1);
+        fbWidth = bx::uint32_max(fbWidth, 1);
+        fbHeight = bx::uint32_max(fbHeight, 1);
+
+        // Update and render
+        onUpdate((float)dt);
+        onRender(winWidth, winHeight, fbWidth, fbHeight, (float)fbWidth / (float)winWidth);
+
+        // Advance to next frame.
+        bgfx::frame();
+        glfwPollEvents();
+    }
+
+    closeGLFWWindow(&win);
 
     return 0;
 }
