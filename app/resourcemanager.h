@@ -1,7 +1,8 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <QString>
+#include <string>
+#include <filesystem>
 
 class ResourceManager {
     ResourceManager() = default;
@@ -20,7 +21,7 @@ public:
 
 
     /// Load a text file and return as a string.
-    [[nodiscard]] QString LoadTextFile(const QString& path, const bool strip = false) const;
+    [[nodiscard]] std::string LoadTextFile(const std::filesystem::path& path, const bool strip = false) const;
 
 };
 

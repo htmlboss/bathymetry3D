@@ -9,35 +9,27 @@
 *.dll
 *.dylib
 
-# Qt-es
-object_script.*.Release
-object_script.*.Debug
-*_plugin_import.cpp
-/.qmake.cache
-/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
-*.moc
-moc_*.cpp
-moc_*.h
-qrc_*.cpp
-ui_*.h
-*.qmlc
-*.jsc
-Makefile*
-*build-*
+GTAGS
+GPATH
+GRTAGS
 
-# Qt unit tests
-target_wrapper.*
+# Visual studio junk
+*.ipch
+*.tlog
+*.obj
+*.log
+*.exe
+*.ilk
+*.pdb
+*.idb
+*.exp
+*.ipdb
+*.iobj
+.vs/
+/build/interim/*
 
-# QtCreator
-*.autosave
+.vscode/
 
-# QtCreator Qml
-*.qmlproject.user
-*.qmlproject.user.*
 
-# QtCreator CMake
-CMakeLists.txt.user*
+# Clion
+.idea/
