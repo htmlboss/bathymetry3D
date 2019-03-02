@@ -7,3 +7,6 @@
 [submodule "app/ThirdParty/glfw"]
 	path = app/ThirdParty/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "app/ThirdParty/bimg"]
+	path = app/ThirdParty/bimg
+	url = git://github.com/bkaradzic/bimg.git

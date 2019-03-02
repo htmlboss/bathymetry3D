@@ -1,13 +1,13 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include <chrono>
 
 /***********************************************************************************/
 class Timer {
-
+	using time_point = std::chrono::high_resolution_clock::time_point;
 public:
     Timer() = default;
+	~Timer() = default;
 
     Timer(Timer&&) = default;
     Timer(const Timer&) = delete;
@@ -23,11 +23,8 @@ public:
     }
 
 private:
-    using time_point = std::chrono::high_resolution_clock::time_point;
 
     time_point m_prevTimePoint, m_currTimePoint;
 
-    std::chrono::duration<double> m_delta;
+    std::chrono::duration<double> m_delta{ 0.0 };
 };
-
-#endif // TIMER_H
