@@ -23,13 +23,12 @@
     <ClCompile Include="app\loguru_impl.cpp" />
     <ClCompile Include="app\main.cpp" />
     <ClCompile Include="app\Platform\Window.cpp" />
-    <ClCompile Include="app\resourcemanager.cpp" />
+    <ClCompile Include="app\Rendering\MeshRenderer.cpp" />
     <ClCompile Include="app\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\App.h" />
     <ClInclude Include="app\AppDesc.h" />
-    <ClInclude Include="app\Command.h" />
     <ClInclude Include="app\Keys.h" />
     <ClInclude Include="app\NcFilePtr.h" />
     <ClInclude Include="app\Platform\Keyboard.h" />
@@ -37,7 +36,8 @@
     <ClInclude Include="app\Platform\PlatformUpdateData.h" />
     <ClInclude Include="app\Platform\PlatformUtils.h" />
     <ClInclude Include="app\Platform\Window.h" />
-    <ClInclude Include="app\resourcemanager.h" />
+    <ClInclude Include="app\Rendering\MeshRenderer.h" />
+    <ClInclude Include="app\Rendering\RenderUtils.h" />
     <ClInclude Include="app\Timer.h" />
     <ClInclude Include="app\vertex.h" />
   </ItemGroup>
@@ -100,7 +100,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\interm\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)app\ThirdParty\glfw\include\;$(SolutionDir)app\ThirdParty\bgfx\include\;$(SolutionDir)app\ThirdParty\bx\include\;$(SolutionDir)app\ThirdParty\loguru\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)app\ThirdParty\glfw\include\;$(SolutionDir)app\ThirdParty\bgfx\include\;$(SolutionDir)app\ThirdParty\bx\include\;$(SolutionDir)app\ThirdParty\loguru\include\;$(SolutionDir)app\ThirdParty\imgui\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)app\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,7 +110,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\interm\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)app\ThirdParty\glfw\include\;$(SolutionDir)app\ThirdParty\bgfx\include\;$(SolutionDir)app\ThirdParty\bx\include\;$(SolutionDir)app\ThirdParty\loguru\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)app\ThirdParty\glfw\include\;$(SolutionDir)app\ThirdParty\bgfx\include\;$(SolutionDir)app\ThirdParty\bx\include\;$(SolutionDir)app\ThirdParty\loguru\include\;$(SolutionDir)app\ThirdParty\imgui\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)app\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

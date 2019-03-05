@@ -29,6 +29,7 @@ struct PosColorVertex
 
 bgfx::VertexDecl PosColorVertex::ms_decl;
 
+/***********************************************************************************/
 App::~App() {
 	if (m_appInitialised) {
 		bgfx::shutdown();
@@ -36,7 +37,8 @@ App::~App() {
 	}
 }
 
-bool App::init(const AppDesc desc) {
+/***********************************************************************************/
+bool App::init(const AppDesc& desc) {
 
 	// Initialize window
 	if (!m_win.init(desc)) {
@@ -64,6 +66,7 @@ bool App::init(const AppDesc desc) {
 	return true;
 }
 
+/***********************************************************************************/
 void onRender(const uint32_t fbWidth, const uint32_t fbHeight, const float pxRatio) {
 	bgfx::setViewRect(0, 0, 0, uint16_t(fbWidth), uint16_t(fbHeight));
 
@@ -78,6 +81,7 @@ void onRender(const uint32_t fbWidth, const uint32_t fbHeight, const float pxRat
 	bgfx::dbgTextPrintf(0, 4, 0x4f, "Press F1 to toggle bgfx stats, Esc to quit");
 }
 
+/***********************************************************************************/
 void App::run() {
 	if (!m_appInitialised) {
 		LOG_F(ERROR, "App has not been initialised!");

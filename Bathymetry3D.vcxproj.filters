@@ -20,9 +20,6 @@
     <ClCompile Include="app\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="app\resourcemanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="app\App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,11 +32,11 @@
     <ClCompile Include="app\Platform\Window.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="app\Rendering\MeshRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="app\resourcemanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="app\vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -53,9 +50,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="app\NcFilePtr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="app\Command.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="app\Keys.h">
@@ -75,6 +69,12 @@
     </ClInclude>
     <ClInclude Include="app\Platform\PlatformUtils.h">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="app\Rendering\MeshRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="app\Rendering\RenderUtils.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

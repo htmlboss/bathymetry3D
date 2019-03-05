@@ -3,10 +3,13 @@
 #include "Platform/Window.h"
 #include "Timer.h"
 
+/***********************************************************************************/
+// Forward declarations
 struct AppDesc;
 
 // https://github.com/ocornut/imgui/issues/707#issuecomment-463758243
 
+/***********************************************************************************/
 class App {
 	
 public:
@@ -20,7 +23,7 @@ public:
 	App& operator=(const App&) = delete;
 
 	///
-	bool init(const AppDesc desc);
+	bool init(const AppDesc& desc);
 	///
 	void run();
 

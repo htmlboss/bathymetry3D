@@ -18,12 +18,15 @@
 
 #include <array>
 
+/***********************************************************************************/
+// Forward declarations
 struct AppDesc;
 namespace Platform {
 	struct PlatformUpdateData;
 } // namespace Platform
 
 
+/***********************************************************************************/
 namespace Platform {
 
 class Window {
@@ -35,7 +38,7 @@ class Window {
 
 public:
 	///
-	bool init(struct AppDesc desc);
+	bool init(const AppDesc& desc);
 	///
 	[[nodiscard]] PlatformUpdateData update() const;
 	///

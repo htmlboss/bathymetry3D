@@ -8,12 +8,14 @@
 
 namespace Platform {
 
+/***********************************************************************************/
 ///
 void windowErrorCallback(int error, const char* desc) {
 	LOG_F(ERROR, desc);
 }
 
-bool Window::init(const AppDesc desc) {
+/***********************************************************************************/
+bool Window::init(const AppDesc& desc) {
 
 	glfwSetErrorCallback(windowErrorCallback);
 	if (!glfwInit()) {
@@ -96,6 +98,7 @@ bool Window::init(const AppDesc desc) {
 	return true;
 }
 
+/***********************************************************************************/
 PlatformUpdateData Window::update() const {
 	pollEvents();
 
@@ -110,19 +113,23 @@ PlatformUpdateData Window::update() const {
 	return data;
 }
 
+/***********************************************************************************/
 void Window::shutdown() {
 	LOG_F(INFO, "Shutting down GLFW.");
 	glfwTerminate();
 }
 
+/***********************************************************************************/
 void Window::pollEvents() const {
 	glfwPollEvents();
 }
 
+/***********************************************************************************/
 void Window::resetTime() {
 	glfwSetTime(0.0);
 }
 
+/***********************************************************************************/
 bool Window::shouldClose() const {
 	return glfwWindowShouldClose(m_GLFWHandle);
 }
